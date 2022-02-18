@@ -1,0 +1,1 @@
+{"name":"Local: wordleSolver","url":"d:\\CODE\\GIT\\private\\wordle-cpp\\wordleSolver.cpp","tests":[{"id":1645193472557,"input":"1\ngbyyb","output":""}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"d:\\CODE\\GIT\\private\\wordle-cpp\\wordleSolver.cpp","group":"local","local":true}
