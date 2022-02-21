@@ -5,11 +5,12 @@ using namespace std;
 void startwordle(); // function to guess wordle from start of game
 void midwordle(); // function to guess wordle from middle of game
 void guess(); //function that guesses a word from list of possible words 
-void input(); // function to take inpu and update wordle from BRAIN
+void input(); // function to take input and update wordle from BRAIN
 void updateBRAIN(); // function to update BRAIN
 vector<string> wordlist; // conatains all word from dictionary
 vector<string> words; // represents BRAIN
 string strguess; // represents the word that is guessed
+set<int> fixedindex; // represents the index of the word that is already fixed
 
 int main()
 {
@@ -42,6 +43,7 @@ int main()
 
 void startwordle()
 {
+    fixedindex.clear(); // clear the set of fixed index for new guesses
     int cnt = 1;
     words.resize(0);
     fstream finstartvowel; 
@@ -77,6 +79,7 @@ void startwordle()
 
 void midwordle()
 {
+    fixedindex.clear(); // clear the set of fixed index for new guesses
     int cnt = 0;
     words = wordlist;
     fstream finstartvowel; 
@@ -120,7 +123,9 @@ void input() // This is the brain of the code
             yellow.push_back(make_pair(i,strguess[i]));
         }
         else if(str[i]=='g' || str[i]=='G') {
-            green.push_back(make_pair(i,strguess[i]));
+            if(fixedindex.find(i)==fixedindex.end()) {
+                green.push_back(make_pair(i,strguess[i]));
+            }
         }
         else {
             black.push_back(strguess[i]);
@@ -146,6 +151,10 @@ void input() // This is the brain of the code
     for(int i = 0; i < words.size(); i++) {
         bool tobeadded = true;
         for(auto it: yellow) {
+            // // This if statement is added to make sure the one's whose index, those index are already fixed are not again checked
+            // if(fixedindex.find(it.first)!=fixedindex.end()) {
+            //     continue;
+            // }
             if(words[i][it.first] == it.second) {
                 tobeadded = false;
                 break;
@@ -169,13 +178,33 @@ void input() // This is the brain of the code
     }
     words = newwords;
     newwords.resize(0);
+    
+    // // before filtering black update fixedindex
+    //after green & yellow filtering is done, we need to update fixed index to make sure the black filter doesnt confuse multiple occurence of same char as that char shouldn't be included
+    //eg. 
+    //APPLE
+    //ybggg
+    // there is b under 2nd P but P still exist, this pecularity is accordance to offical wordle game; instead of second P getting a b it could have been awarded a y but as per rules this has to be handled for b instead of y
+    for(auto it: green) {
+        fixedindex.insert(it.first);
+    }
+
     // // FILTER BLACK
     for(int i = 0; i < words.size(); i++) {
         bool tobeadded = true;
+
+        // if black char is found in word it is discarded
+        // but while searching black care has to be taken to avoid the indexes that are already fixed
+        // to be added should be made false if black char is found in word except the fixed indexes
         for(auto it: black) {
-            if(words[i].find(it) != string::npos) {
-                tobeadded = false;
-                break;
+            for(int j = 0; j < 5; j++) {
+                if(fixedindex.find(j)!=fixedindex.end()) { // if fixed index found encountered then continue or skip the loop 
+                    continue;
+                }
+                if(words[i][j] == it) {
+                    tobeadded = false;
+                    break;
+                }
             }
         }
         if(tobeadded) {
