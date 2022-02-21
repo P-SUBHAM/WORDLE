@@ -2,7 +2,8 @@
 #include<ctime>
 using namespace std;
 
-void startwordle(); // function to guess wordle from start 
+void startwordle(); // function to guess wordle from start of game
+void midwordle(); // function to guess wordle from middle of game
 void guess(); //function that guesses a word from list of possible words 
 void input(); // function to take inpu and update wordle from BRAIN
 void updateBRAIN(); // function to update BRAIN
@@ -32,7 +33,7 @@ int main()
         cin>>choice;
         switch(choice) {
             case 1: startwordle(); break;
-            case 2: cout<<"TO IMPLEMENT\n"; break;
+            case 2:midwordle(); break;
             default: cout<<"THANK YOU FOR PLAYING\n"; break;
         }
     }
@@ -70,7 +71,37 @@ void startwordle()
     }
     else {
         cout<<"HURRAY!!!!\n";
-        cout<<"WORD "<<cnt<<" : "<<words[0]<<"\n";
+        cout<<"THE WORD is : "<<words[0]<<"\n";
+    }
+}
+
+void midwordle()
+{
+    int cnt = 0;
+    words = wordlist;
+    fstream finstartvowel; 
+    updateBRAIN();
+    int noofwordles = 1;
+    cout<<"ENTER no of wordles already guessed: "; cin>>noofwordles;
+    for(int i=0;i<noofwordles;i++) {
+        cnt++;
+        cout<<"Enter wordle "<<cnt<<" : ";
+        cin>>strguess;
+        input();
+    }
+    while(words.size()>1) {
+        guess();
+        cout<<"WORD "<<cnt<<" : "<<strguess<<"\n"; 
+        cnt++;
+        updateBRAIN();
+        input();
+    }
+    if(words.size()==0) {
+        cout<<"CANNOT SOLVE\n";
+    }
+    else {
+        cout<<"HURRAY!!!!\n";
+        cout<<"THE WORD is : "<<words[0]<<"\n";
     }
 }
 
