@@ -10,7 +10,8 @@ void updateBRAIN(); // function to update BRAIN
 vector<string> wordlist; // conatains all word from dictionary
 vector<string> words; // represents BRAIN
 string strguess; // represents the word that is guessed
-set<int> fixedindex; // represents the index of the word that is already fixed
+//set<int> fixedindexg; // represents the index of the word that is already fixed(g)
+set<char> charexistsgy; // represents the characters that exists for sure (y)|(g)
 
 int main()
 {
@@ -43,7 +44,8 @@ int main()
 
 void startwordle()
 {
-    fixedindex.clear(); // clear the set of fixed index for new guesses
+    //fixedindexg.clear(); // clear the set of fixed index for new game
+    charexistsgy.clear(); // clear the set of sure characters for new game
     int cnt = 1;
     words.resize(0);
     fstream finstartvowel; 
@@ -79,7 +81,8 @@ void startwordle()
 
 void midwordle()
 {
-    fixedindex.clear(); // clear the set of fixed index for new guesses
+    //fixedindexg.clear(); // clear the set of fixed index for new game
+    charexistsgy.clear(); // clear the set of sure characters for new game
     int cnt = 0;
     words = wordlist;
     fstream finstartvowel; 
@@ -117,20 +120,34 @@ void input() // This is the brain of the code
         return;
     }
     vector<pair<int,char>> yellow,green;
-    vector<char> black;
+    set<char> black;
     for(int i=0;i<str.size();i++) {
         if(str[i]=='y' || str[i] == 'Y') {
+            // if(charexistsgy.find(str[i])==charexistsgy.end()) {
+            //     yellow.push_back(make_pair(i,strguess[i]));
+            // }
+            charexistsgy.insert(strguess[i]);
             yellow.push_back(make_pair(i,strguess[i]));
         }
         else if(str[i]=='g' || str[i]=='G') {
-            if(fixedindex.find(i)==fixedindex.end()) {
-                green.push_back(make_pair(i,strguess[i]));
-            }
+            // if(fixedindexg.find(i)==fixedindexg.end()) {
+            //     green.push_back(make_pair(i,strguess[i]));
+            // }
+            charexistsgy.insert(strguess[i]);
+            green.push_back(make_pair(i,strguess[i]));
         }
         else {
-            black.push_back(strguess[i]);
+            black.insert(strguess[i]);
         }
     }
+    // /////////////////
+    // FILTER OUT char that exist 100% from black
+    for(auto it: charexistsgy) {
+        if(black.find(it)!=black.end()) {
+            black.erase(it);
+        }
+    }
+    // ////////////////
     vector<string> newwords;
     // // FILTER GREEN
     for(int i = 0; i < words.size(); i++) {
@@ -151,10 +168,6 @@ void input() // This is the brain of the code
     for(int i = 0; i < words.size(); i++) {
         bool tobeadded = true;
         for(auto it: yellow) {
-            // // This if statement is added to make sure the one's whose index, those index are already fixed are not again checked
-            // if(fixedindex.find(it.first)!=fixedindex.end()) {
-            //     continue;
-            // }
             if(words[i][it.first] == it.second) {
                 tobeadded = false;
                 break;
@@ -179,15 +192,24 @@ void input() // This is the brain of the code
     words = newwords;
     newwords.resize(0);
     
-    // // before filtering black update fixedindex
-    //after green & yellow filtering is done, we need to update fixed index to make sure the black filter doesnt confuse multiple occurence of same char as that char shouldn't be included
-    //eg. 
-    //APPLE
-    //ybggg
-    // there is b under 2nd P but P still exist, this pecularity is accordance to offical wordle game; instead of second P getting a b it could have been awarded a y but as per rules this has to be handled for b instead of y
-    for(auto it: green) {
-        fixedindex.insert(it.first);
-    }
+    // // // before filtering black update fixedindexg
+    // //after green & yellow filtering is done, we need to update fixed index to make sure the black filter doesnt confuse multiple occurence of same char as that char shouldn't be included
+    // //eg. 
+    // //APPLE
+    // //ybggg
+    // // there is b under 2nd P but P still exist, this pecularity is accordance to offical wordle game; instead of second P getting a b it could have been awarded a y but as per rules this has to be handled for b instead of y
+    // for(auto it: green) {
+    //     fixedindexg.insert(it.first);
+    // }
+    // // // before filtering black update charexistsgy
+    // //after green & yellow filtering is done, we need to update charexistsgy
+    // //eg.
+    // //FANGA
+    // //bybbb
+    // // there is y under 2nd A but b under 5th A, this pecularity is accordance to offical wordle game; instead of second A getting a y it could have been awarded a b but as per rules this has to be handled for y instead of b
+    // for(auto it: yellow) {
+    //     charexistsgy.insert(it.second);
+    // }
 
     // // FILTER BLACK
     for(int i = 0; i < words.size(); i++) {
@@ -198,9 +220,12 @@ void input() // This is the brain of the code
         // to be added should be made false if black char is found in word except the fixed indexes
         for(auto it: black) {
             for(int j = 0; j < 5; j++) {
-                if(fixedindex.find(j)!=fixedindex.end()) { // if fixed index found encountered then continue or skip the loop 
-                    continue;
-                }
+                // if(fixedindexg.find(j)!=fixedindexg.end()) { // if fixed index found encountered then continue or skip the loop 
+                //     continue;
+                // }
+                // if(charexistsgy.find(it)!=charexistsgy.end()) { // if sure char found encountered then continue or skip the loop 
+                //     continue;
+                // }
                 if(words[i][j] == it) {
                     tobeadded = false;
                     break;
