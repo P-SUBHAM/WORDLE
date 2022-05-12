@@ -7,6 +7,7 @@ void midwordle(); // function to guess wordle from middle of game
 void guess(); //function that guesses a word from list of possible words 
 void input(); // function to take input and update wordle from BRAIN
 void updateBRAIN(); // function to update BRAIN
+void help(); // function to display help
 vector<string> wordlist; // conatains all word from dictionary
 vector<string> words; // represents BRAIN
 string strguess; // represents the word that is guessed
@@ -25,16 +26,18 @@ int main()
         }
     }
     int choice = 1;
-    while(choice == 1 || choice == 2) {
-        cout<<"------WELCOME TO WORDLE SOLVER---------------\n";
+    while(choice < 4) {
+        cout<<"\n------WELCOME TO WORDLE SOLVER---------------\n";
         cout<<"1. START from beginning\n";
         cout<<"2. START from last played state\n";
-        cout<<"3. EXIT\n";
+        cout<<"3. HELP \n";
+        cout<<"4. EXIT\n";
         cout<<"Enter your choice: ";
         cin>>choice;
         switch(choice) {
             case 1: startwordle(); break;
-            case 2:midwordle(); break;
+            case 2: midwordle(); break;
+            case 3: help(); break;
             default: cout<<"THANK YOU FOR PLAYING\n"; break;
         }
     }
@@ -234,4 +237,23 @@ void updateBRAIN() //UPDATES BRAIN WITH WHAT CODE THINKS
         fbrain<<words[i]<<"\n";
     }
     fbrain<<words[words.size()-1];
+}
+
+void help()
+{
+    cout<<"\n";
+    cout<<"HELP\n";
+    cout<<"How to use :\n";
+    cout<<"Enter 1 to start guess of a fresh game\n";
+    cout<<"Enter 2 to start guess from middle of a game\n";
+    cout<<"Once inside guess mode the code will guess a word\n";
+    cout<<"You need to use the word in the wordle game you're playing\n";
+    cout<<"After that type the respective colour gyb for the wordle\n";
+    cout<<"g = green(present at appropriate position)\n";
+    cout<<"y = yellow(present but not at appropriate position)\n";
+    cout<<"b = black(not prsent)\n";
+    cout<<"You can enter x to skip the current word and get a new guessword\n";
+    cout<<"based on the previous word and gyb sequence the code will give you new word to guess\n";
+    cout<<"Once guess is over you can enter 4 to exit the game\n";
+    cout<<"\n";
 }
